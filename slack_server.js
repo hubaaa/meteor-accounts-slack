@@ -1,25 +1,36 @@
+log = new ObjectLogger('Slack', 'debug');
+
 Slack = {};
 
 OAuth.registerService('slack', 2, null, function(query) {
-  var accessToken = getAccessToken(query);
-  var identity = getIdentity(accessToken);
+  try {
+    log.enter('query', query);
+    var accessTokenData = getAccessTokenData(query);
+    expect(accessTokenData.access_token).to.be.ok;
+    log.debug('accessTokenData=' + accessTokenData);
+    var identity = getIdentity(accessTokenData.access_token);
+    log.debug('identity=' + identity);
 
-  return {
-    serviceData: {
-      id: identity.user_id,
-      accessToken: accessToken
-    },
-    options: { profile: {
-      name: identity.user,
-      url: identity.url,
-      team: identity.team,
-      user_id: identity.user_id,
-      team_id: identity.team_id
-    } }
-  };
+    return {
+      serviceData: {
+        id: identity.user_id,
+        user: identity.user,
+        accessToken: accessTokenData.access_token,
+        team_id: identity.team_id,
+        team: identity.team,
+        url: identity.url,
+        incoming_webhook: accessTokenData.incoming_webhook
+      },
+      options: { profile: {
+        name: identity.user
+      } }
+    };
+  } finally {
+    log.return();
+  }
 });
 
-var getAccessToken = function (query) {
+var getAccessTokenData = function (query) {
   var config = ServiceConfiguration.configurations.findOne({service: 'slack'});
   if (!config)
     throw new ServiceConfiguration.ConfigError();
@@ -48,7 +59,7 @@ var getAccessToken = function (query) {
   if (!response.data.ok) { // if the http response was a json object with an error attribute
     throw new Error("Failed to complete OAuth handshake with Slack. " + response.data.error);
   } else {
-    return response.data.access_token;
+    return response.data;
   }
 };
 
