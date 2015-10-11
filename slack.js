@@ -1,15 +1,22 @@
+log = new ObjectLogger('Accounts', 'debug');
+
 Accounts.oauth.registerService('slack');
 
 if (Meteor.isClient) {
   Meteor.loginWithSlack = function(options, callback) {
-    // support a callback without options
-    if (! callback && typeof options === "function") {
-      callback = options;
-      options = null;
-    }
+    try {
+      log.enter('loginWithSlack', options);
+      // support a callback without options
+      if (! callback && typeof options === "function") {
+        callback = options;
+        options = null;
+      }
 
-    var credentialRequestCompleteCallback = Accounts.oauth.credentialRequestCompleteHandler(callback);
-    Slack.requestCredential(options, credentialRequestCompleteCallback);
+      var credentialRequestCompleteCallback = Accounts.oauth.credentialRequestCompleteHandler(callback);
+      Slack.requestCredential(options, credentialRequestCompleteCallback);
+    } finally {
+      log.return();
+    }
   };
 } else {
   Accounts.addAutopublishFields({

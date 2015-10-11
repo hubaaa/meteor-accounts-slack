@@ -1,8 +1,8 @@
 Package.describe({
   summary: "Login service for Slack accounts",
   version: "1.0.5",
-  git: "https://github.com/efounders/meteor-accounts-slack.git",
-  name: "acemtp:accounts-slack"
+  git: "https://github.com/hubaaa/meteor-accounts-slack",
+  name: "hubaaa:accounts-slack"
 });
 
 Package.on_use(function(api) {
@@ -16,6 +16,10 @@ Package.on_use(function(api) {
   api.use('service-configuration', ['client', 'server']);
   api.use('accounts-base', ['client', 'server']);
   api.use('accounts-oauth', ['client', 'server']);
+  api.use([
+    'practicalmeteor:loglevel@1.2.0_2',
+    'practicalmeteor:chai@2.1.0_1'
+  ]);
 
   api.add_files('slack_server.js', 'server');
 
