@@ -22,7 +22,8 @@ OAuth.registerService('slack', 2, null, function(query) {
         incoming_webhook: accessTokenData.incoming_webhook
       },
       options: { profile: {
-        name: identity.user
+        name: identity.user,
+        team_url: identity.url
       } }
     };
   } finally {
